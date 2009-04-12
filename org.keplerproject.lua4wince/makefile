@@ -46,7 +46,8 @@ else
 OS_SOCKS:=source/socket/wsocket.c
 endif	
 
-LUA_FILES:=$(shell find lua/5.1 -type f)
+LUA_FILES:=$(filter-out CVS% %CVS %CVS/Entries %CVS/Repository %CVS/Root %CVS/Template,$(shell find lua/5.1 -type f))
+LUA_DIRS:=$(sort $(foreach FILE, $(LUA_FILES), $(dir $(FILE))))
 
 SRC=source/main.c $(LFS_SRC) $(SOCKET_SRC) $(OS_SOCKS) $(EXTS_SRC) source/lua.c
 OBJ=$(subst .c,.o,$(SRC))
@@ -54,8 +55,13 @@ OBJ=$(subst .c,.o,$(SRC))
 LIBS=-lws2 -lm 
 
 define mobile_mkdir
-$(foreach FILE,$(LUA_FILES),\
-synce-pmkdir /usr/local/share/$(dir $(FILE))|echo;)
+synce-pmkdir /usr | echo 
+synce-pmkdir /usr/local | echo 
+synce-pmkdir /usr/local/share | echo 
+synce-pmkdir /usr/local/share/lua | echo 
+synce-pmkdir /usr/local/share/lua/5.1 | echo 
+$(foreach DIR,$(LUA_DIRS),\
+synce-pmkdir /usr/local/share/$(DIR)|echo;)
 endef
 
 define mobile_cpfiles
@@ -93,7 +99,7 @@ ifneq "$(TARGETNAME)" "linux"
 	$(mobile_mkdir)
 	$(mobile_cpfiles)
 	echo 'Deploy successful'
-
+	
 endif
 	
 clean-mobile:

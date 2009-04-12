@@ -1,5 +1,5 @@
 /*
-** $Id: loadlib.c,v 1.1 2009-04-12 00:03:43 jasonsantos Exp $
+** $Id: loadlib.c,v 1.2 2009-04-12 01:35:06 jasonsantos Exp $
 ** Dynamic library loader for Lua
 ** See Copyright Notice in lua.h
 **
@@ -133,7 +133,7 @@ static void *ll_load (lua_State *L, const char *path) {
 
 static lua_CFunction ll_sym (lua_State *L, void *lib, const char *sym) {
 	/* Using explicitly the ascii version of function (thanks to Ian McIntosh)*/
-  /* lua_CFunction f = (lua_CFunction)GetProcAddress((HINSTANCE)lib, sym);  JASON */
+  /* lua_CFunction f = (lua_CFunction)GetProcAddress((HINSTANCE)lib, sym);  IAN/JASON */
   lua_CFunction f = (lua_CFunction)GetProcAddressA((HINSTANCE)lib, sym);
   if (f == NULL) pusherror(L);
   return f;

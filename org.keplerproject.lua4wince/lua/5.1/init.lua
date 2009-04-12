@@ -1,16 +1,25 @@
-require'lfs'
+
+
 function log(...)
-	f = io.open('logfile.txt', 'a+')
-	f:write(string.format("%s -- %s\n", os.date("%x %X"), table.concat({...}, ' / ')))
+	local f = io.open('logfile.txt', 'a+')
+	local t = {...}
+	local s = ''
+
+	f:write(string.format("%s %s\n", os.date("%x %X"), table.foreach(t, 	function(_, o)
+																				return ': ' .. tostring(s) .. tostring(o) 
+																			end)))
 	f:close()
 end
-log'before'
-t = lfs.attributes('logfile.txt')
-table.foreach(t, log)
-log'after'
 
 print = log
 
-package.path = '?;./?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/tests/?.lua;;'
-assert(lfs.chdir'/usr/local/share/lua/5.1/tests')
+require'lfs'
+require'socket'
+
+log(loadstring"function a(b) return 'asd'  end")
+
+-- testing Lua
+package.path = '?;./?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/testsuite/lua/?.lua;;'
+assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/lua')
 dofile'all.lua'
+

@@ -1,5 +1,5 @@
 /*
-** $Id: lzio.h,v 1.1 2009-04-12 00:03:43 jasonsantos Exp $
+** $Id: lzio.h,v 1.2 2009-04-12 01:35:06 jasonsantos Exp $
 ** Buffered streams
 ** See Copyright Notice in lua.h
 */
@@ -13,7 +13,8 @@
 #include "lmem.h"
 
 
-#define EOZ	(-1)			/* end of stream */
+//#define EOZ	(-1)			/* end of stream */
+#define EOZ	(0x00)			/* IAN -  end of stream (this platform is UNICODE!) */
 
 typedef struct Zio ZIO;
 

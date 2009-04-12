@@ -35,6 +35,8 @@ a = {}
 print('functions')
 function a:test ()
   while contCreate <= limit do
+  	log(tonumber(contCreate))
+  	log(string.format("function temp(a) return 'a%d' end", contCreate))
     loadstring(string.format("function temp(a) return 'a%d' end", contCreate))()
     assert(temp() == string.format('a%d', contCreate))
     contCreate = contCreate+1

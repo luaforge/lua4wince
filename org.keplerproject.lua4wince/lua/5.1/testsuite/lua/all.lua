@@ -66,7 +66,7 @@ dofile = function (n)
   return f()
 end
 
-dofile('main.lua')
+--dofile('main.lua')
 
 do
   local u = newproxy(true)
@@ -87,11 +87,11 @@ assert(dofile('attrib.lua') == 27)
 assert(dofile('locals.lua') == 5)
 dofile('constructs.lua')
 dofile('code.lua')
-do
+--[[do
   local f = coroutine.wrap(assert(loadfile('big.lua')))
   assert(f() == 'b')
   assert(f() == 'a')
-end
+end]]
 dofile('nextvar.lua')
 dofile('pm.lua')
 dofile('api.lua')
@@ -101,7 +101,7 @@ dofile('closure.lua')
 dofile('errors.lua')
 dofile('math.lua')
 dofile('sort.lua')
-assert(dofile('verybig.lua') == 10); collectgarbage()
+--assert(dofile('verybig.lua') == 10); collectgarbage()
 dofile('files.lua')
 
 if #msgs > 0 then
