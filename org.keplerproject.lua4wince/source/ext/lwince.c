@@ -46,6 +46,10 @@ static char		tmpFileName[MAX_PATH];
 
 RTEXP int chdir( const char *dirname ) {
 	char	*ptr;
+
+	if (GetFileAttributesA(dirname) != FILE_ATTRIBUTE_DIRECTORY) /* JASONSANTOS -- Added check to whether directory exists */
+		return -1; /* dirname is not a valid directory */
+
 	strcpy(luaCurrentDirectory, dirname);
 	while((ptr=strchr(luaCurrentDirectory, '/')) != NULL)
 		*ptr = '\\';
@@ -675,7 +679,15 @@ RTEXP	void GetSystemTimeAsFileTime(FILETIME *pft) {
 	return;
 }
 
-
+/*
+** Implementation of GetFileAttributesA - requires wide char conversion
+** as WinCE uses GetFileAttributesW
+*/
+RTEXP	DWORD GetFileAttributesA(const char *pathName) {
+	wchar_t	wpath[BUFSIZ];
+	MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, pathName, -1, wpath, BUFSIZ);
+	return(GetFileAttributesW(wpath));
+}
 
 /*
 ** ===================================================================

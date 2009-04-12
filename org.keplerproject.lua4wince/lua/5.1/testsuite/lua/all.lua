@@ -24,7 +24,7 @@ end
 
 local c = os.clock()
 
--- assert(os.setlocale"C") -- JASONSANTOS - setlocale won't be supported for WindowsCE
+-- assert(os.setlocale"C") -- JASONSANTOS - setlocale won't be supported for WindowsCE at first
 
 local T,print,gcinfo,format,write,assert,type =
       T,print,gcinfo,string.format,io.write,assert,type

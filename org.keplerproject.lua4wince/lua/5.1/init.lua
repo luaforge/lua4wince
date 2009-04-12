@@ -1,5 +1,6 @@
+-- Lua for Windows Mobile initializer
 
-
+--- log function
 function log(...)
 	local f = io.open('logfile.txt', 'a+')
 	local t = {...}
@@ -18,8 +19,13 @@ require'socket'
 
 log(loadstring"function a(b) return 'asd'  end")
 
--- testing Lua
+--[[ testing Lua
 package.path = '?;./?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/testsuite/lua/?.lua;;'
 assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/lua')
 dofile'all.lua'
+]]
+
+assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/lfs')
+dofile'test.lua'
+
 
