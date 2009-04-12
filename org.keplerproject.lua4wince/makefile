@@ -82,7 +82,7 @@ $(TARGETEXE): $(OBJ)
 	
 clean:
 	rm -Rf $(OBJ)
-	rm -Rf bin
+	rm -Rf bin/*
 	
 	
 
