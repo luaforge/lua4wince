@@ -57,8 +57,8 @@ f:close()
 local testdate = os.time({ year = 2007, day = 10, month = 2, hour=0})
 assert (lfs.touch (tmpfile, testdate))
 local new_att = assert (lfs.attributes (tmpfile))
-assert (new_att.access == testdate, "could not set access time")
-assert (new_att.modification == testdate, "could not set modification time")
+assert (new_att.access == testdate, "could not set access time "..tostring(new_att.access)..'<>'..tostring(testdate))
+assert (new_att.modification == testdate, "could not set modification time "..tostring(new_att.modification)..'<>'..tostring(testdate))
 
 -- Change access and modification time
 local testdate1 = os.time({ year = 2007, day = 10, month = 2, hour=0})

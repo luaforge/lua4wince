@@ -74,11 +74,37 @@ RTEXP char *getcwd( char *buffer, int maxlen ) {
 };
 
 RTEXP	int _mkdir(const char *dirname) {
-	errno=ENOENT;
+
+	BOOL success = CreateDirectoryA(dirname, NULL);
+
+	if (success!=0)
+		return 0;
+
+	DWORD err = GetLastError();
+
+	if (err==ERROR_PATH_NOT_FOUND)
+		errno=ENOENT;
+	else if (err==ERROR_ALREADY_EXISTS)
+		errno=EEXIST;
+	else
+		errno=EIO;
 	return -1;
 }
 
-RTEXP	int	rmdir(const char *path) {
+RTEXP	int	rmdir(const char *dirname) {
+	BOOL success = RemoveDirectoryA(dirname);
+
+	if (success!=0)
+		return 0;
+
+	DWORD err = GetLastError();
+
+	if (err==ERROR_PATH_NOT_FOUND)
+		errno=ENOENT;
+	else if (err==ERROR_ACCESS_DENIED)
+		errno=EPERM;
+	else
+		errno=EIO;
 	return -1;
 }
 
@@ -687,6 +713,26 @@ RTEXP	DWORD GetFileAttributesA(const char *pathName) {
 	wchar_t	wpath[BUFSIZ];
 	MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, pathName, -1, wpath, BUFSIZ);
 	return(GetFileAttributesW(wpath));
+}
+
+/*
+** Implementation of CreateDirectoryA - requires wide char conversion
+** as WinCE uses CreateDirectoryW
+*/
+RTEXP	BOOL WINAPI  CreateDirectoryA(const char *pathName,  LPSECURITY_ATTRIBUTES lpSecurityAttributes) {
+	wchar_t	wpath[BUFSIZ];
+	MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, pathName, -1, wpath, BUFSIZ);
+	return(CreateDirectoryW(wpath, lpSecurityAttributes));
+}
+
+/*
+** Implementation of RemoveDirectoryA - requires wide char conversion
+** as WinCE uses RemoveDirectoryW
+*/
+RTEXP	BOOL WINAPI  RemoveDirectoryA(const char *pathName) {
+	wchar_t	wpath[BUFSIZ];
+	MultiByteToWideChar(CP_ACP, MB_ERR_INVALID_CHARS, pathName, -1, wpath, BUFSIZ);
+	return(RemoveDirectoryW(wpath));
 }
 
 /*
