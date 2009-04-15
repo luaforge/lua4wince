@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------
 -- LuaSocket helper module
 -- Author: Diego Nehab
--- RCS ID: $Id: socket.lua,v 1.1 2009-04-12 00:03:43 jasonsantos Exp $
+-- RCS ID: $Id: socket.lua,v 1.2 2009-04-15 15:02:32 jasonsantos Exp $
 -----------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------
@@ -10,8 +10,17 @@
 local base = _G
 local string = require("string")
 local math = require("math")
-local socket = require("socket.core")
+
+-- local socket = require("socket.core") -- JASON
+local socket = package.loaded['socket.core']
+
+local foreach = table.foreach
+
 module("socket")
+
+foreach(socket, function(k,v)
+	_M[k]=v
+end)
 
 -----------------------------------------------------------------------------
 -- Exported auxiliar functions

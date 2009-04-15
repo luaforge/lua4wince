@@ -1,4 +1,6 @@
 -- Lua for Windows Mobile initializer
+package.path = '?;./?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/?/init.lua;;;'
+assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/copas')
 
 --- log function
 function log(...)
@@ -10,6 +12,13 @@ function log(...)
 																				return ': ' .. tostring(s) .. tostring(o) 
 																			end)))
 	f:close()
+end
+
+oldrequire = require
+
+function require(...)
+	log(...)
+	return oldrequire(...)
 end
 
 print = log
@@ -25,7 +34,14 @@ assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/lua')
 dofile'all.lua'
 ]]
 
+--[[ testing LuaFileSystem
 assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/lfs')
 dofile'test.lua'
+]]
 
+--[[ testing LuaSocket
+assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/socket')
+dofile'testsrvr.lua'
+]]
 
+dofile'test.lua'

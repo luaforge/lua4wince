@@ -11,7 +11,7 @@
 * IO routines, however, follow the Lua  style, being very similar  to the
 * standard Lua read and write functions.
 *
-* RCS ID: $Id: luasocket.c,v 1.1 2009-04-12 00:03:43 jasonsantos Exp $
+* RCS ID: $Id: luasocket.c,v 1.2 2009-04-15 15:02:32 jasonsantos Exp $
 \*=========================================================================*/
 
 /*=========================================================================*\
@@ -89,7 +89,7 @@ static int global_unload(lua_State *L) {
 static int base_open(lua_State *L) {
     if (socket_open()) {
         /* export functions (and leave namespace table on top of stack) */
-        luaL_openlib(L, "socket", func, 0);
+        luaL_openlib(L, "socket.core", func, 0);
 #ifdef LUASOCKET_DEBUG
         lua_pushstring(L, "_DEBUG");
         lua_pushboolean(L, 1);
