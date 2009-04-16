@@ -104,6 +104,12 @@ static int loadfileW(lua_State*L, wchar_t* fileName) {
 	return status;
 }
 
+int _jason_openlibs(lua_State* L) {
+	luaopen_socket_core(L); 	/* Opening the Socket library */
+	luaopen_lfs(L);				/* Opening the Lua Filesystem library */
+	luaopen_rings(L);			/* Opening the Rings library */
+}
+
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine,
 		int nCmdShow) {
 
@@ -117,9 +123,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine,
 
 	luaL_openlibs(L);
 
-	luaopen_socket_core(L); 	/* Opening the Socket library */
+	_jason_openlibs(L); 	/* Open the additional built-in libraries */
 
-	luaopen_lfs(L);				/* Opening the Lua Filesystem library */
 
 	luaL_register(L, "mobile", mobile);
 

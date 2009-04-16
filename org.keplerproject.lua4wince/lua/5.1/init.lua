@@ -1,6 +1,6 @@
 -- Lua for Windows Mobile initializer
 package.path = '?;./?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/?/init.lua;;;'
-assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/copas')
+assert(lfs.chdir'/usr/local/share/lua/5.1')
 
 --- log function
 function log(...)
@@ -26,7 +26,7 @@ print = log
 require'lfs'
 require'socket'
 
-log(loadstring"function a(b) return 'asd'  end")
+table.foreach(lfs, print)
 
 --[[ testing Lua
 package.path = '?;./?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/testsuite/lua/?.lua;;'
@@ -44,4 +44,9 @@ assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/socket')
 dofile'testsrvr.lua'
 ]]
 
+--[[
+assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/copas')
 dofile'test.lua'
+]]
+
+dofile'xavante_start'

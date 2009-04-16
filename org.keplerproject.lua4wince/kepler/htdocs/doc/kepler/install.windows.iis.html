@@ -1,0 +1,214 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Kepler: The Lua Web Development Platform</title>
+    <link rel="stylesheet" href="http://www.keplerproject.org/doc.css" type="text/css"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo">
+        <a href="http://www.keplerproject.org"><img alt="Kepler" src="kepler.png"/></a>
+    </div>
+	<div id="product_name"><big><strong>Kepler</strong></big></div>
+	<div id="product_description">The Lua Web Development Platform</div>
+</div> <!-- id="product" -->
+
+<div id="main">
+	
+<div id="navigation">
+<h1>Kepler</h1>
+	<ul>
+		<li><a href="index.html">Home</a>
+			<ul>
+				<li><a href="index.html#overview">Overview</a></li>
+				<li><a href="index.html#status">Status</a></li>
+				<li><a href="index.html#download">Download</a></li>
+				<li><a href="index.html#history">History</a></li>
+				<li><a href="index.html#credits">Credits</a></li>
+				<li><a href="index.html#contact">Contact us</a></li>
+			</ul>
+		</li>
+		<li><a href="install.html">Installation</a>
+            <ul>
+                <li><a href="install.unix.html">Unix/OSX</a></li>
+                <li><a href="install.windows.html">Windows</a>
+                    <ul>
+                        <li><a href="install.windows.html#installer">Installer</a></li>
+                        <li><a href="install.windows.html#directories">Directories</a></li>
+                        <li><a href="install.windows.html#dependencies">Dependencies</a></li>
+                        <li><strong>IIS</strong></li>
+                        <li><a href="install.windows.apache2.html">Apache 2</a></li>
+                        <li><a href="install.windows.xavante.html">Xavante</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </li>
+        <li><a href="manual.html">Manual</a>
+			<ul>
+				<li><a href="manual.html#introduction">Introduction</a></li>
+				<li><a href="manual.html#configuration">Configuration</a></li>
+			</ul>
+		</li>
+		<li><a href="reference.html">Reference</a></li>
+		<li><a href="examples.html">Examples</a></li>
+        <li><a href="http://luaforge.net/projects/kepler/">Project</a>
+            <ul>
+                <li><a href="bugtracker.html">Bug Trackers</a></li>
+                <li><a href="http://luaforge.net/scm/?group_id=104">CVS</a></li>
+            </ul>
+        </li>
+		<li><a href="license.html">License</a></li>
+	</ul>
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+<h2>Using Kepler with IIS</h2>
+
+<p>Kepler can be used with Microsoft IIS with the following launchers:</p>
+
+<ul>
+	<li><a href="#isapi">ISAPI</a></li>
+	<li><a href="#fastcgi">FastCGI</a></li>
+	<li><a href="#cgi">CGI</a></li>
+</ul>
+
+<p>Each launching method has pros and cons, you should choose with care
+the best one for your needs. Note that depending on the Windows and IIS version
+that you are using, your screen may be slightly different.</p>
+
+<h2><a name="isapi"></a>ISAPI</h2>
+
+<p>The ISAPI launcher usually performs better than the CGI launcher and is 
+the preferred installation on IIS servers.</p>
+
+<p>
+The first step is to copy all
+<a href="install.windows.html#dependencies">dependent libraries</a> 
+to the directory where IIS runs from.
+This is usually <code>"%SystemRoot%\system32\inetsrv"</code>.
+</p>
+
+<p>
+The next step is to map the URL extensions that should be associated with CGILua. 
+The procedures described below will configure two extension mappings for the 
+whole Web server. One for <code>.lua</code> URLs and another for <code>.lp</code> URLs.
+These procedures can also be executed for a single virtual directory instead
+of the whole server.
+</p>
+
+<p>First open the IIS manager and go to the Default Web Site properties, as depicted below.</p>
+
+<img src="images/windows/iis_properties.gif" alt="IIS Properties Window" class="screenshot" />
+
+<p>Now click on the "Configuration..." button on the "Home Directory" tab:</p>
+
+<img src="images/windows/iis_website.gif" alt="IIS Web Site" class="screenshot" />
+
+<p>Then add the two new mappings, ".lua" and ".lp". These mappings must point to 
+the ISAPI launcher module, <code>cgilua_isapi.dll</code> (you may need to enclose the
+launcher path in quotes).</p>
+
+<p>Depending on your system configuration, all the files in <code>&lt;<em>Kepler Home</em>&gt;\bin</code>
+may need to be made readable by the IIS anonymous user. Tipically this user is something 
+like IUSR_MACHINENAME. Keep in mind that this may be not the safest solution.</p>
+
+<p>After the above configuration steps, you should be able to execute
+<code>.lp</code> and <code>.lua</code> URLs. The default Kepler configuration
+assumes that the web files are located in the <code>&lt;<em>Kepler Home</em>&gt;\web</code> directory
+(usually in <code>C:\kepler\1.1\web</code>). Assuming you have a file called
+<code>index.lp</code> placed in <code>\web</code>, you should be able to
+open the URL <code>localhost/index.lp</code> with your browser.</p>
+
+<h2><a name="fastcgi"></a>FastCGI</h2>
+
+<p>This part of the documentation is still under development.</p>
+
+<h2><a name="cgi"></a>CGI</h2>
+
+<p>The CGI launcher is the simplest option to deploy a CGILua installation on IIS.
+It has no external dependencies and runs on every webserver that supports CGI.
+The main drawback of the CGI launcher is its performance, since usually a new 
+system process is created to handle each request.</p>
+
+<p>There are two ways to install the CGI launcher on IIS, the first is through an
+extension mapping and the other is executing the launcher directly. If you use an
+extension mapping a typical URL will be like
+<code>http://www.mydomain.com/test.lua</code>. If you choose to 
+execute the launcher directly the URL will be something like 
+<code>http://www.mydomain.com/kepler/cgi/cgi.exe/test.lua</code>.</p>
+
+<h3>Using CGI Extension mapping</h3>
+
+<p>The procedures described below will configure two extension mappings for the 
+whole web server. One for <code>.lua</code> and another for <code>.lp</code>.
+These procedures can also be executed for a single virtual directory instead
+of the whole server.</p>
+
+<p>First go to the web site properties, depicted below.</p>
+
+<img src="images/windows/iis_properties.gif" alt="IIS Properties" class="screenshot" />
+
+<p>Now click on the "Configuration..." button on the "Home Directory" tab:</p>
+
+<img src="images/windows/iis_website.gif" alt="IIS Web Site" class="screenshot" />
+
+<p>Then add the two new mappings, ".lua" and ".lp". These mappings must point to 
+the CGI launcher executable, <code>cgi.exe</code> (you may need to enclose the
+launcher path in quotes).</p>
+
+<p>Depending on your system configuration, all the files in <code>&lt;<em>Kepler Home</em>&gt;\bin</code>
+may need to be made readable by the IIS anonymous user. Tipically this user is something 
+like IUSR_MACHINENAME. Keep in mind that this may be not the safest solution.</p>
+
+<p>After the above configuration steps, you should be able to execute
+<code>.lp</code> and <code>.lua</code> URLs. The default Kepler configuration
+assumes that the web files are located in the <code>&lt;<em>Kepler Home</em>&gt;\web</code> directory
+(usually in <code>C:\kepler\1.1\web</code>). Assuming you have a file called
+<code>index.lp</code> placed in <code>\web</code>, you should be able to
+open the URL <code>localhost/index.lp</code> with your browser.</p>
+
+<h3>Executing the CGI launcher directly</h3>
+
+<p>Executing the CGI launcher directly exposes the executable name on the URL,
+but allows the use of Kepler in systems where you don't have the rights to
+map extensions.</p>
+
+<p>It may be also a good solution for systems where both the CGI and other(s)
+launchers are used at the same time.</p>
+
+<p>To use Kepler this way, first create a virtual directory that will hold
+your application. Let's assume this virtual directory is called <code>kepler</code>
+and point to the <code>&lt;<em>Kepler Home</em>&gt;\web</code> folder for example.</p>
+
+<p>Then create a virtual directory for the CGI launcher
+(such as <code>/cgi</code> for example),
+and point this virtual directory to <code>&lt;<em>Kepler Home</em>&gt;\bin</code>.</p>
+
+<p>You must use use the IIS manager to give execution permission to the
+<code>/cgi</code> directory.</p>
+
+<p>Finally test your configuration with a URL like
+<code>http://localhost/kepler/cgi/cgi.exe/test.lua</code>, where
+the <code>test.lua</code> would be located at your
+<code>&lt;<em>Kepler Home</em>&gt;\web</code> directory.</p>
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer">Valid XHTML 1.0!</a></p>
+	<p><small>$Id: install.windows.iis.html,v 1.1 2009-04-16 16:17:29 jasonsantos Exp $</small></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->
+
+</body>
+</html>

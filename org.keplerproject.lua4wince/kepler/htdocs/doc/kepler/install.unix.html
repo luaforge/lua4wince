@@ -1,0 +1,436 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Kepler: The Lua Web Development Platform</title>
+    <link rel="stylesheet" href="http://www.keplerproject.org/doc.css" type="text/css"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"><a href="http://www.keplerproject.org">
+		<img alt="Kepler" src="kepler.png"/>
+	</a></div>
+	<div id="product_name"><big><strong>Kepler</strong></big></div>
+	<div id="product_description">The Lua Web Development Platform</div>
+</div> <!-- id="product" -->
+
+<div id="main">
+	
+<div id="navigation">
+<h1>Kepler</h1>
+	<ul>
+		<li><a href="index.html">Home</a>
+			<ul>
+				<li><a href="index.html#overview">Overview</a></li>
+				<li><a href="index.html#status">Status</a></li>
+				<li><a href="index.html#download">Download</a></li>
+				<li><a href="index.html#history">History</a></li>
+				<li><a href="index.html#credits">Credits</a></li>
+				<li><a href="index.html#contact">Contact us</a></li>
+			</ul>
+		</li>
+		<li><a href="install.html">Installation</a>
+            <ul>
+                <li><strong>Unix/OSX</strong>
+                    <ul>
+                        <li><strong>Introduction</strong></li>
+                        <li><a href="install.unix.apache2.html">Apache 2</a></li>
+                        <li><a href="install.unix.lighttpd.html">Lighttpd</a></li>
+                        <li><a href="install.unix.xavante.html">Xavante</a></li>
+                    </ul>
+                </li>
+                <li><a href="install.windows.html">Windows</a></li>
+            </ul>
+        </li>
+        <li><a href="manual.html">Manual</a>
+			<ul>
+				<li><a href="manual.html#introduction">Introduction</a></li>
+				<li><a href="manual.html#configuration">Configuration</a></li>
+			</ul>
+		</li>
+		<li><a href="reference.html">Reference</a></li>
+		<li><a href="examples.html">Examples</a></li>
+        <li><a href="http://luaforge.net/projects/kepler/">Project</a>
+            <ul>
+                <li><a href="bugtracker.html">Bug Trackers</a></li>
+                <li><a href="http://luaforge.net/scm/?group_id=104">CVS</a></li>
+            </ul>
+        </li>
+		<li><a href="license.html">License</a></li>
+	</ul>
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+
+<h2><a name="introduction"></a>Unix/OS X Installation Instructions</h2>
+
+<p>
+This document shows how to install Kepler from sources on Unix-like systems
+such as Linux and Mac OS X. The procedures are almost the same on all Unix
+systems, differences will be explicitly noted below.
+</p>
+
+<h3><a name="requirements"></a>Requirements</h3>
+
+<p>
+At its core, Kepler depends only on Lua. You can get Lua from your distribution,
+from the <a href="http://luabinaries.luaforge.net/">LuaBinaries</a> project, build
+Lua yourself from the sources available at <a href="http://www.lua.org">lua.org</a>,
+or let Kepler build it for you. Make sure you see the <a href="#finding_lua">Finding
+Lua</a> section below if you plan to use a pre-built Lua rather than letting Kepler
+build Lua.
+</p>
+
+<p>
+If building Lua, you can enable command history facilities in its interactive interpreter
+by using the optional package <a href="http://tiswww.case.edu/php/chet/readline/rltop.html">GNU
+Readline</a>; the build process will use it if available, or it can be disabled explicitly.
+On Linux, Readline depends also on <a href="http://www.gnu.org/software/ncurses/">NCurses</a>.
+</p>
+
+<p>
+Additionally, optional modules distributed with Kepler require some
+external libraries, which become build dependencies if they are selected
+during configuration. Requirements for optional modules are:
+</p>
+
+<ul>
+	<li><a href="http://www.libexpat.org/">Expat</a>, required by LuaExpat</li>
+	<li><a href="http://zziplib.sourceforge.net/">ZZipLib</a>, required by
+	LuaZip</li>
+	<li><a href="http://www.fastcgi.com">FCGI</a>, required by the FastCGI
+	launcher</li>
+	<li>For LuaSQL, one of the following, depending on the selected driver:
+	<ul>
+		<li><a href="http://www.unixodbc.org">UnixODBC</a>, required by the ODBC
+		driver</li>
+		<li><a href="http://www.postgresql.org">PostgreSQL</a>, required by the
+		PostgreSQL driver</li>
+		<li><a href="http://www.oracle.com/technology/tech/oci/">Oracle Call Interface 8</a>,
+		required by the OCI8 driver</li>
+		<li><a href="http://www.sqlite.org/">SQLite 2.x</a> (versions 3.x are
+		incompatible), required by the SQLite driver</li>
+		<li><a href="http://www.mysql.com/">MySQL</a>, required by the MySQL
+		driver</li>
+	</ul></li>
+</ul>
+
+<p>
+Development packages (libraries and headers) for these additional dependencies
+should be installed in the system. On Linux distributions, package repositories
+usually include development packages marked as <code>-dev</code> or
+<code>-devel</code>.</p>
+
+<p>
+On Mac OS X, these additional dependencies can be fulfilled installing those
+packages manually or using repositories of additional software, such as
+<a href="http://fink.sourceforge.net/">Fink</a>.
+</p>
+
+<h3><a name="build_process"></a>The build process</h3>
+
+<p>
+The build process uses the familiar "<code>configure; make; make install</code>"
+routine. However, you'll typically want to pass some options to the
+<code>configure</code> script in order to specify installation directories,
+which Kepler launcher to use and which optional modules to build.
+</p>
+
+<h4>Configuring</h4>
+
+<p>
+The command:
+</p>
+
+<pre class="example">
+./configure --help
+</pre>
+
+<p>
+will list all available flags, as well as the default values for the particular
+version of Kepler you are building. The three fundamental flags are:
+</p>
+
+<table>
+	<tr>
+		<td><code>--prefix=DIR</code></td>
+		<td>Directory where Kepler should be installed. All Kepler components
+		will be installed relative to the given path.
+		</td>
+	</tr>
+	<tr>
+		<td><code>--sysconfdir=DIR</code></td>
+		<td>Directory where Kepler configuration files should be installed.
+		All Kepler configuration files will be installed relative to the
+		given path (ie, <code>--sysconfdir=/etc</code> will result in
+		a directory called <code>/etc/kepler/1.1/</code>).
+		</td>
+	</tr>
+	<tr>
+		<td><code>--includedir=DIR</code></td>
+		<td>Directory where C header files should be installed.
+		This is used when Kepler builds Lua.
+		</td>
+	</tr>
+	<tr>
+		<td><code>--kepler-web=DIR</code></td>
+		<td>Root of the directory tree of files to be served by the web server.
+		When Xavante is compiled, it is configured to use this directory;
+		other Kepler launchers could be configured to use it as well.
+		</td>
+	</tr>
+	<tr>
+		<td><code>--kepler-log=DIR</code></td>
+		<td>Directory for Kepler log files to be stored.
+		</td>
+	</tr>
+	<tr>
+		<td><code>--launcher=LAUNCHER</code></td>
+		<td>Which launcher to use. Valid options are:
+		<ul>
+			<li><strong>cgi</strong> - to build a CGI launcher</li>
+			<li><strong>fastcgi</strong> - to build a FastCGI launcher</li>
+			<li><strong>mod2</strong> - to build an Apache 2 module, mod_lua</li>
+			<li><a href="http://www.keplerproject.org/xavante/"><strong>xavante</strong></a>
+			- to build Xavante, a native Lua webserver which offers a native Kepler launcher</li>
+		</ul>
+		</td>
+	</tr>
+	<tr>
+		<td><code>--with-optional=PACKAGES</code></td>
+		<td>A comma-separated list of optional packages to build. Valid options are:
+		<ul>
+		<li><a href="http://www.keplerproject.org/lualogging/"><strong>lualogging</strong></a>
+		- a simple API to use logging features in Lua</li>
+		<li><a href="http://www.keplerproject.org/luasql/"><strong>luasql</strong></a>
+		- database connectivity for the Lua programming language</li>
+		<li><a href="http://www.keplerproject.org/luaexpat/"><strong>luaexpat</strong></a>
+		- XML Expat parsing for the Lua programming language</li>
+		<li><a href="http://www.keplerproject.org/luazip/"><strong>luazip</strong></a>
+		- allows reading files inside zip files</li>
+		<li><a href="http://www.keplerproject.org/md5/"><strong>md5</strong></a>
+		- a basic cryptographic Library for Lua</li>
+		</ul>
+		</td>
+	</tr>
+</table>
+
+<h4><a name="finding_lua"></a>Finding Lua</h4>
+
+<p>
+You may want to specify whether Lua should be compiled and installed along in
+the Kepler prefix, or if the build should use an already-existing installation
+of Lua from your system. By default, the <code>configure</code> script will
+try to detect the presence of Lua in your system, but you can specify this
+explictly using one of the following flags: </p>
+
+<table>
+	<tr>
+		<td><code>--enable-lua</code></td>
+		<td> Build and install Lua along with Kepler.</td>
+	</tr>
+	<tr>
+		<td><code>--disable-lua</code></td>
+		<td> Do not build or install Lua along with Kepler,
+		     use the one available in the system.</td>
+	</tr>
+	<tr>
+		<td><code>--with-lua=PREFIX</code></td>
+		<td> Do not build Lua, use Lua from given prefix.</td>
+	</tr>
+	<tr>
+		<td><code>--with-lua-include=DIR</code></td>
+		<td> When using a pre-built Lua, you can also specify its
+		     includes dir if <code>configure</code> fails to find it.</td>
+	</tr>
+	<tr>
+		<td><code>--with-lua-lib=DIR</code></td>
+		<td> When using a pre-built Lua, you can also specify its
+		     libraries dir if <code>configure</code> fails to find it.</td>
+	</tr>
+	<tr>
+		<td><code>--lua-suffix=SUFFIX</code></td>
+		<td> Versioning suffix to use in Lua filenames.
+		     For example, <code>--with-lua-suffix=5.1</code> instructs Kepler to use
+		     names such as lua5.1 and liblua5.1.a; <code>--with-lua-suffix=</code>
+		     corresponds to names such as lua and liblua.a.</td>
+	</tr>
+	<tr>
+		<td><code>--with-readline=DIR</code></td>
+		<td> Lua can be built with Readline support for command history
+		     facilities in its interactive interpreter. This flag can
+		     be used to supply its location in case it fails to be 
+		     automatically found.</td>
+	</tr>
+	<tr>
+		<td><code>--without-readline</code></td>
+		<td> To cut down the number of dependencies at expense of losing
+		     the command history facilities in the interpreter, Readline
+		     support can be disabled when building Lua along with Kepler.
+		</td>
+	</tr>
+	<tr>
+		<td><code>--with-ncurses=DIR</code></td>
+		<td> Prefix where NCurses is installed. Used by Lua
+		     when Readline is enabled on Linux.</td>
+	</tr>
+</table>
+
+<h4>External dependencies</h4>
+
+<p>
+The following flags can be used to specify options relative to optional components.
+Of special importance is the flag for specifying which SQL driver to use.
+</p>
+
+<table width="100%">
+	<tr>
+		<td><code>--with-luasql-driver=DRIVER</code></td>
+		<td>When  Which SQL driver to use with LuaSQL. Valid options are:
+			<ul>
+			<li><strong>odbc</strong> - build the UnixODBC driver</li>
+			<li><strong>postgres</strong> - build the PostgreSQL driver</li>
+			<li><strong>oci8</strong> - build the OCI8 driver</li>
+			<li><strong>sqlite</strong> - build the SQLite 2.x driver</li>
+			<li><strong>mysql</strong> - build the MySQL driver</li>
+			</ul>
+		</td>
+	</tr>
+	<tr>
+		<td><code>--with-expat=DIR</code></td>
+		<td> Prefix where Expat is installed. Used by LuaExpat.</td>
+	</tr>
+	<tr>
+		<td><code>--with-zzip=DIR</code></td>
+		<td> Prefix where ZZip is installed. Used by LuaZip.</td>
+	</tr>
+	<tr>
+		<td><code>--with-oci8=DIR</code></td>
+		<td> Prefix where OCI8 is installed. Used by the OCI8 driver for LuaSQL.</td>
+	</tr>
+	<tr>
+		<td><code>--with-mysql=DIR</code></td>
+		<td> Prefix where MySQL is installed. Used by the MySQL driver
+		for LuaSQL.</td>
+	</tr>
+	<tr>
+		<td><code>--with-postgres=DIR</code></td>
+		<td> Prefix where Postgres is installed. Used by the PostgreSQL driver
+		for LuaSQL.</td>
+	</tr>
+	<tr>
+		<td><code>--with-sqlite=DIR</code></td>
+		<td> Prefix where SQLite is installed. Used by the SQLite driver for LuaSQL.</td>
+	</tr>
+	<tr>
+		<td><code>--with-odbc=DIR</code></td>
+		<td> Prefix where UnixODBC is installed. Used by the ODBC driver for LuaSQL.</td>
+	</tr>
+	<tr>
+		<td><code>--with-fastcgi=DIR</code></td>
+		<td> Prefix where FCGI is installed. Used by the FastCGI launcher.</td>
+	</tr>
+	<tr>
+		<td><code>--with-apache=DIR</code></td>
+		<td> Prefix where Apache is installed. Used by the Mod2 launcher.</td>
+	</tr>
+</table>
+
+<h4>Build example</h4>
+
+<p>
+As an example, the following setup will configure Kepler to build LuaBinaries
+and the optional components LuaLogging, LuaSQL and MD5, and use MySQL as its
+LuaSQL driver (the following should be entered in a single line).
+</p>
+
+<pre class="example">
+./configure --enable-lua --with-optional=lualogging,luasql,md5 --with-luasql-driver=mysql
+</pre>
+
+<p>
+The configure script will then output information such as this: (exact values
+may vary according to the system)
+</p>
+
+<pre class="example">
+Will build Lua along with Kepler.
+Will install Lua along with Kepler.
+Checking for MySQL... found: /Programs/MySQL/4.1.12/include/mysql/mysql.h
+Writing configuration...
+Installation prefix: /usr/local
+Launcher: xavante
+Optional packages: lualogging,luasql,md5
+
+Done. You can now run 'make' to build.
+</pre>
+
+<p>
+If any of the checks fail, you may need to pass additional flags specifying where
+required libraries are to be found (see the particular error messages for more
+information). If no errors were reported, you can proceed to the next step and
+build Kepler with:
+</p>
+
+<pre class="example">
+make
+</pre>
+
+<p>
+Please note that as of Kepler 1.1, the Makefile assumes that <code>make</code> is
+GNU Make (which is true for Linux and Mac OS X systems; other BSD variants may
+need to temporarily replace make in their $PATH with a symlink to gmake).
+</p>
+
+<p>
+Once the build is completed, you can install Kepler with:
+</p>
+
+<pre class="example">
+make install
+</pre>
+
+<p>
+Depending on your selected installation directory, you may need to perform the
+above step with superuser privileges, using <code>su</code> or <code>sudo</code> --
+for example, on an account with administrative privileges on Mac OS X, you can
+run:
+</p>
+
+<pre class="example">
+sudo make install
+</pre>
+
+<h3><a name="webservers"></a>Configuring the Web Server</h3>
+
+<p>Your Web server has to be configured to use Kepler and this configuration depends
+not only on the Web server being used, but also on the choosen launcher. After editing
+your Web server configuration you may need to restart it to activate the new configuration.</p>
+
+<p>For more details on the Unix Web server configuration for Kepler please check:</p>
+
+<ul>
+    <li><a href="install.unix.apache2.html">Apache 2</a> - supports mod_lua, FastCGI and CGI launchers</li>
+    <li><a href="install.unix.lighttpd.html">Lighttpd</a> - supports FastCGI and CGI launchers</li>
+    <li><a href="install.unix.xavante.html">Xavante</a> - offers a native launcher</li>
+</ul>
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer">Valid XHTML 1.0!</a></p>
+	<p><small>$Id: install.unix.html,v 1.1 2009-04-16 16:17:29 jasonsantos Exp $</small></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->
+
+</body>
+</html>

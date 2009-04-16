@@ -1,0 +1,216 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<title>Kepler: The Lua Web Development Platform</title>
+    <link rel="stylesheet" href="http://www.keplerproject.org/doc.css" type="text/css"/>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+</head>
+
+<body>
+
+<div id="container">
+
+<div id="product">
+	<div id="product_logo"><a href="http://www.keplerproject.org">
+		<img alt="Kepler" src="kepler.png"/>
+	</a></div>
+	<div id="product_name"><big><strong>Kepler</strong></big></div>
+	<div id="product_description">The Lua Web Development Platform</div>
+</div> <!-- id="product" -->
+
+<div id="main">
+	
+<div id="navigation">
+<h1>Kepler</h1>
+	<ul>
+		<li><a href="index.html">Home</a>
+			<ul>
+				<li><a href="index.html#overview">Overview</a></li>
+				<li><a href="index.html#status">Status</a></li>
+				<li><a href="index.html#download">Download</a></li>
+				<li><a href="index.html#history">History</a></li>
+				<li><a href="index.html#credits">Credits</a></li>
+				<li><a href="index.html#contact">Contact us</a></li>
+			</ul>
+		</li>
+		<li><a href="install.html">Installation</a>
+            <ul>
+                <li><a href="install.unix.html">Unix/OSX</a>
+                    <ul>
+                        <li><a href="install.unix.html#introduction">Introduction</a></li>
+                        <li><strong>Apache 2</strong></li>
+                        <li><a href="install.unix.lighttpd.html">Lighttpd</a></li>
+                        <li><a href="install.unix.xavante.html">Xavante</a></li>
+                    </ul>
+                </li>
+                <li><a href="install.windows.html">Windows</a></li>
+            </ul>
+        </li>
+        <li><a href="manual.html">Manual</a>
+			<ul>
+				<li><a href="manual.html#introduction">Introduction</a></li>
+				<li><a href="manual.html#configuration">Configuration</a></li>
+			</ul>
+		</li>
+		<li><a href="reference.html">Reference</a></li>
+		<li><a href="examples.html">Examples</a></li>
+        <li><a href="http://luaforge.net/projects/kepler/">Project</a>
+            <ul>
+                <li><a href="bugtracker.html">Bug Trackers</a></li>
+                <li><a href="http://luaforge.net/scm/?group_id=104">CVS</a></li>
+            </ul>
+        </li>
+		<li><a href="license.html">License</a></li>
+	</ul>
+</div> <!-- id="navigation" -->
+
+<div id="content">
+
+<h2>Using Kepler with Apache 2 in Unix</h2>
+
+<p>You can configure Kepler with Apache 2 with the following launchers:</p>
+
+<ul>
+	<li><a href="#mod">mod_lua</a></li>
+	<li><a href="#fastcgi">FastCGI</a></li>
+	<li><a href="#cgi">CGI</a></li>
+</ul>
+
+<p>Please check the corresponding launcher section for the configuration details.</p>
+
+<h2><a name="mod"></a>mod_lua</h2>
+
+<p>mod_lua allows the use of the Apache native API. This is usually the easier 
+option for Kepler on an Apache 2 Server.</p>
+
+<p>The Apache 2 installation directory will be refered here as <code>APACHE_DIR</code>. 
+In Unix this is usually the diretory <code>/usr/local/apache2</code>.</p>
+
+<p>To use Kepler as a mod_lua application you have to configure Apache to associate URLs
+ending in <code>.lua</code> or <code>.lp</code> with Kepler. In order to do that, open
+the Apache configuration file (<code>APACHE_DIR/conf/httpd.conf</code>) on your editor,
+search for a series of <code>LoadModule</code> directives and add the following one:</p>
+
+<pre class="example">
+# Lua module for Apache2 configuration file.
+LoadModule lua_module modules/mod_lua.so
+
+&lt;IfModule mod_lua.c&gt;
+    # Definition of file types
+    AddHandler lua_module .lua
+    AddHandler lua_module .lp
+    # Definition of Lua module handlers for file types
+    LuaHandler lua_module
+&lt;/IfModule&gt;
+</pre>
+
+<p>Debian-based distributions have an <code>/etc/apache2/conf.d</code> directory
+where you can put Apache configuration snippets. Just create a file called
+<code>kepler.conf</code> with the directives above and put it there.</p>
+
+<p>Save the file and
+<a href="http://httpd.apache.org/docs/2.2/stopping.html">restart</a> Apache. In case
+of errors, check if <code>mod_lua.so</code> is present on the
+<code>APACHE_DIR/modules</code> directory. If not present you'll need to
+check the <a href="install.unix.html#building">building</a> steps for the mod_lua
+launcher.</p>
+
+<p>If you want your Apache configured as a Kepler-only server you can change the
+<code>DocumentRoot</code> to point to the Kepler web directory. Change the following
+sections in your Apache configuration file:</p>
+
+<pre class="example">
+#
+# DocumentRoot: The directory out of which you will serve your
+# documents. By default, all requests are taken from this directory, but
+# symbolic links and aliases may be used to point to other locations.
+#
+DocumentRoot "/usr/local/kepler/web"
+
+...
+
+#
+# This should be changed to whatever you set DocumentRoot to.
+#
+&lt;Directory "/usr/local/kepler/web"&gt;
+</pre>
+
+<h2><a name="fastcgi"></a>FastCGI</h2>
+
+<p>FastCGI is also a good option for Kepler on an Apache 2 Server. You need to have mod_fcgid, the
+new FastCGI module for Apache. To use Kepler as a FastCGI application, you have to configure Apache
+to associate <code>.lua</code> and <code>.lp</code> extensions with the Kepler FastCGI launcher
+(<code>/usr/local/bin/fastcgi</code>) in the default installation. Edit the Apache configuration file
+(usually <code>/usr/local/apache2/conf/httpd.conf</code> if you compiled Apache from source)
+to include the following:</p>
+
+<pre class="example">
+&lt;IfModule mod_fcgid.c&gt;
+  SocketPath /tmp/kepler-fcgi
+  AddHandler fcgid-script .lua .lp
+  FCGIWrapper /usr/local/bin/fastcgi .lua
+  FCGIWrapper /usr/local/bin/fastcgi .lp
+&lt;/IfModule&gt;
+</pre>
+
+<p>Debian-based distributions have an <code>/etc/apache2/conf.d</code> directory
+where you can put Apache configuration snippets. Just create a file called
+<code>kepler.conf</code> with the directives above and put it there. Save the file and
+<a href="http://httpd.apache.org/docs/2.2/stopping.html">restart</a> Apache.</p>
+
+<p>If you want your Apache configured as a Kepler-only server you can change the
+<code>DocumentRoot</code> to point to the Kepler web directory. Change the following
+sections in your Apache configuration file:</p>
+
+<pre class="example">
+#
+# DocumentRoot: The directory out of which you will serve your
+# documents. By default, all requests are taken from this directory, but
+# symbolic links and aliases may be used to point to other locations.
+#
+DocumentRoot "/usr/local/kepler/web"
+
+...
+
+#
+# This should be changed to whatever you set DocumentRoot to.
+#
+&lt;Directory "/usr/local/kepler/web"&gt;
+</pre>
+
+<p>
+For further information check 
+<a href="http://fastcgi.com/mod_fastcgi/docs/mod_fastcgi.html">mod_fastcgi documentation</a>.
+</p>
+
+
+<h2><a name="cgi"></a>CGI</h2>
+
+<p>Kepler can be used as a standard Apache CGI application.</p>
+
+<p>This part of the documentation is still under development.</p>
+
+</div> <!-- id="content" -->
+
+</div> <!-- id="main" -->
+
+<div id="about">
+	<p><a href="http://validator.w3.org/check?uri=referer">Valid XHTML 1.0!</a></p>
+	<p><small>$Id: install.unix.apache2.html,v 1.1 2009-04-16 16:17:29 jasonsantos Exp $</small></p>
+</div> <!-- id="about" -->
+
+</div> <!-- id="container" -->
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+

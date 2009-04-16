@@ -24,6 +24,8 @@ TARGETDIR=bin/$(TARGETNAME)
 
 TARGETEXE=$(TARGETDIR)/lua.exe
 
+RECEIPTDIR=.sendreceipt
+
 BASE_SRC=$(wildcard source/*.c)
 LFS_SRC=$(wildcard source/lfs/*.c)
 EXTS_SRC=$(wildcard source/ext/*.c)
@@ -49,12 +51,15 @@ endif
 LUA_FILES:=$(filter-out CVS% %CVS %CVS/Entries %CVS/Repository %CVS/Root %CVS/Template,$(shell find lua/5.1 -type f))
 LUA_DIRS:=$(sort $(foreach FILE, $(LUA_FILES), $(dir $(FILE))))
 
-SRC=source/main.c $(LFS_SRC) $(SOCKET_SRC) $(OS_SOCKS) $(EXTS_SRC) source/lua.c
+KEPLER_FILES:=$(filter-out CVS% %CVS %CVS/Entries %CVS/Repository %CVS/Root %CVS/Template,$(shell find kepler -type f))
+KEPLER_DIRS:=$(sort $(foreach FILE, $(KEPLER_FILES), $(dir $(FILE))))
+
+SRC=source/main.c $(LFS_SRC) $(SOCKET_SRC) $(OS_SOCKS) $(EXTS_SRC) source/rings/rings.c source/lua.c 
 OBJ=$(subst .c,.o,$(SRC))
 	
 LIBS=-lws2 -lm 
 
-define mobile_mkdir
+define lua_mkdir
 synce-pmkdir /usr | echo 
 synce-pmkdir /usr/local | echo 
 synce-pmkdir /usr/local/share | echo 
@@ -64,14 +69,33 @@ $(foreach DIR,$(LUA_DIRS),\
 synce-pmkdir /usr/local/share/$(DIR)|echo;)
 endef
 
+define kepler_mkdir
+synce-pmkdir /usr/local/kepler | echo 
+synce-pmkdir /usr/local/kepler/apps | echo 
+synce-pmkdir /usr/local/kepler/etc | echo 
+synce-pmkdir /usr/local/kepler/htdocs | echo 
+synce-pmkdir /usr/local/kepler/log | echo 
+$(foreach DIR,$(KEPLER_DIRS),\
+synce-pmkdir /usr/local/$(DIR)|echo;)
+endef
+
+define mobile_mkdir
+$(lua_mkdir)
+$(kepler_mkdir)
+endef
+
 define mobile_cpfiles
 $(foreach FILE,$(LUA_FILES),\
 synce-pcp $(FILE) :/usr/local/share/$(FILE);)
+$(foreach FILE,$(KEPLER_FILES),\
+synce-pcp $(FILE) :/usr/local/$(FILE);)
 endef
 
 define mobile_rmfiles
 $(foreach FILE,$(LUA_FILES),\
 synce-prm /usr/local/share/$(FILE)|echo;)
+$(foreach FILE,$(KEPLER_FILES),\
+synce-prm /usr/local/$(FILE)|echo;)
 endef
 
 
