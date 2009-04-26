@@ -1,4 +1,4 @@
-.PHONY: execute install clean-mobile install-exe install-lua
+.PHONY: execute install install-lua install-exe
 
 TARGETNAME=mingw32ce
 
@@ -22,13 +22,19 @@ endif
 
 TARGETDIR=bin/$(TARGETNAME)
 
-TARGETEXE=$(TARGETDIR)/lua.exe
+EXENAME=lua.exe
+
+TARGETEXE=$(TARGETDIR)/$(EXENAME)
 
 RECEIPTDIR=.sendreceipt
 
 BASE_SRC=$(wildcard source/*.c)
 LFS_SRC=$(wildcard source/lfs/*.c)
 EXTS_SRC=$(wildcard source/ext/*.c)
+RNGS_SRC=$(wildcard source/rings/*.c)
+LPEG_SRC=$(wildcard source/lpeg/*.c)
+LMD5_SRC=$(wildcard source/md5/*.c)
+LB64_SRC=$(wildcard source/lbase64/*.c)
 
 SOCKET_SRC:= \
 	source/socket/luasocket.c \
@@ -54,7 +60,7 @@ LUA_DIRS:=$(sort $(foreach FILE, $(LUA_FILES), $(dir $(FILE))))
 KEPLER_FILES:=$(filter-out CVS% %CVS %CVS/Entries %CVS/Repository %CVS/Root %CVS/Template,$(shell find kepler -type f))
 KEPLER_DIRS:=$(sort $(foreach FILE, $(KEPLER_FILES), $(dir $(FILE))))
 
-SRC=source/main.c $(LFS_SRC) $(SOCKET_SRC) $(OS_SOCKS) $(EXTS_SRC) source/rings/rings.c source/lua.c 
+SRC=source/main.c $(LFS_SRC) $(SOCKET_SRC) $(OS_SOCKS) $(LPEG_SRC) $(EXTS_SRC) $(RNGS_SRC) $(LMD5_SRC) $(LB64_SRC) source/lua.c 
 OBJ=$(subst .c,.o,$(SRC))
 	
 LIBS=-lws2 -lm 
@@ -65,8 +71,6 @@ synce-pmkdir /usr/local | echo
 synce-pmkdir /usr/local/share | echo 
 synce-pmkdir /usr/local/share/lua | echo 
 synce-pmkdir /usr/local/share/lua/5.1 | echo 
-$(foreach DIR,$(LUA_DIRS),\
-synce-pmkdir /usr/local/share/$(DIR)|echo;)
 endef
 
 define kepler_mkdir
@@ -75,8 +79,6 @@ synce-pmkdir /usr/local/kepler/apps | echo
 synce-pmkdir /usr/local/kepler/etc | echo 
 synce-pmkdir /usr/local/kepler/htdocs | echo 
 synce-pmkdir /usr/local/kepler/log | echo 
-$(foreach DIR,$(KEPLER_DIRS),\
-synce-pmkdir /usr/local/$(DIR)|echo;)
 endef
 
 define mobile_mkdir
@@ -84,23 +86,41 @@ $(lua_mkdir)
 $(kepler_mkdir)
 endef
 
-define mobile_cpfiles
-$(foreach FILE,$(LUA_FILES),\
-synce-pcp $(FILE) :/usr/local/share/$(FILE);)
-$(foreach FILE,$(KEPLER_FILES),\
-synce-pcp $(FILE) :/usr/local/$(FILE);)
-endef
-
-define mobile_rmfiles
-$(foreach FILE,$(LUA_FILES),\
-synce-prm /usr/local/share/$(FILE)|echo;)
-$(foreach FILE,$(KEPLER_FILES),\
-synce-prm /usr/local/$(FILE)|echo;)
-endef
-
 
 all: $(TARGETEXE)
 	echo 'Build successful'
+
+mobile-mkdir:
+	$(mobile_mkdir)
+	
+$(RECEIPTDIR)/lua/%.rpt: lua/%
+	echo $<
+	synce-pmkdir $(dir /usr/local/share/$<)|echo
+	synce-prm /usr/local/share/$<|echo
+	synce-pcp $< :/usr/local/share/$<
+	mkdir -p $(dir $@)
+	touch $@
+	
+$(RECEIPTDIR)/kepler/%.rpt: kepler/%
+	echo $<
+	synce-pmkdir $(dir /usr/local/$<)|echo
+	synce-prm /usr/local/$<|echo
+	synce-pcp $< :/usr/local/$<
+	mkdir -p $(dir $@)
+	touch $@
+
+$(RECEIPTDIR)/$(TARGETEXE).rpt: $(TARGETEXE) 
+	echo $<
+	synce-prm $(EXENAME)|echo
+	synce-pcp $<
+	mkdir -p $(dir $@)
+	touch $@
+	
+install-lua: $(foreach FILE,$(LUA_FILES), $(RECEIPTDIR)/${FILE}.rpt) $(foreach FILE,$(KEPLER_FILES), $(RECEIPTDIR)/${FILE}.rpt)
+	echo 'Install lua files successful'
+	
+install-exe: $(RECEIPTDIR)/$(TARGETEXE).rpt
+	echo 'Install executable files successful'
 	
 source/%.o: source/%.c
 	echo $<
@@ -113,29 +133,19 @@ $(TARGETEXE): $(OBJ)
 clean:
 	rm -Rf $(OBJ)
 	rm -Rf bin/*
-	
-	
+	rm -Rf $(RECEIPTDIR)/*
 
 
-install: clean-mobile install-exe install-lua
-ifneq "$(TARGETNAME)" "linux"
-	synce-pcp $(TARGETEXE)
-	$(mobile_mkdir)
-	$(mobile_cpfiles)
+install: mobile-mkdir install-lua install-exe 
 	echo 'Deploy successful'
 	
-endif
-	
-clean-mobile:
-	synce-prm lua.exe  | echo
-	$(mobile_rmfiles)
 	
 execute:
 ifneq "$(TARGETNAME)" "linux"
-	synce-prun My\ Documents/lua.exe
+	synce-prun My\ Documents/$(EXENAME)
 	echo 'Run successful'
 else
-	$(TARGETDIR)/lua.exe
+	$(TARGETDIR)/$(EXENAME)
 	echo 'Run successful'
 endif
 		
