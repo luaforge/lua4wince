@@ -25,8 +25,14 @@ print = log
 
 require'lfs'
 require'socket'
+require'lpeg'
+require'md5'
+require're'
+require'base64'
 
 table.foreach(lfs, print)
+
+mobile.message('Parameters:' .. table.concat({...}, ' '))
 
 --[[ testing Lua
 package.path = '?;./?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/testsuite/lua/?.lua;;'
@@ -39,14 +45,19 @@ assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/lfs')
 dofile'test.lua'
 ]]
 
---[[ testing LuaSocket
-assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/socket')
-dofile'testsrvr.lua'
-]]
-
 --[[
-assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/copas')
+assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/md5')
 dofile'test.lua'
 ]]
 
-dofile'xavante_start'
+--[[
+assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/lpeg')
+dofile'test.lua'
+]]
+
+--[[
+assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/lbase64')
+dofile'test.lua'
+]]
+
+--dofile'xavante_start'

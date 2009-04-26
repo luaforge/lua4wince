@@ -104,10 +104,24 @@ static int loadfileW(lua_State*L, wchar_t* fileName) {
 	return status;
 }
 
+int luaopen_lpeg (lua_State *L);
+
 int _jason_openlibs(lua_State* L) {
 	luaopen_socket_core(L); 	/* Opening the Socket library */
 	luaopen_lfs(L);				/* Opening the Lua Filesystem library */
 	luaopen_rings(L);			/* Opening the Rings library */
+	luaopen_md5_core(L);			/* Opening the MD5 library */
+	luaopen_base64(L);			/* Opening the Base64 library */
+	luaopen_des56(L);			/* Opening the DES56 library */
+	/* Opening the LPeg library */
+	lua_pushcclosure(L, luaopen_lpeg, 0);
+	lua_pushstring(L, "lpeg");
+	lua_call(L, 1, 0);
+}
+
+
+int isdigit(int c) {
+	return _isctype (c, _DIGIT)	;
 }
 
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine,

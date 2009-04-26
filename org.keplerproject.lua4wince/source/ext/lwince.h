@@ -7,7 +7,7 @@
 #if !defined(_LWINCE)
 #define _LWINCE
 
-
+#include <ctype.h>
 #include <windef.h>
 #include <winbase.h>
 #include "locale.h"
@@ -124,6 +124,5 @@ RTEXP	HINSTANCE LoadLibraryA(const char *path);
 RTEXP	DWORD FormatMessageA(DWORD dwFlags,LPCVOID lpSource,DWORD dwMessageId,DWORD dwLanguageId,
 					 char *lpBuffer,DWORD nSize,va_list *Arguments);
 RTEXP	DWORD GetModuleFileNameA( HMODULE hModule, char* lpFilename, DWORD nSize );
-
 
 #endif		// _LWINCE
