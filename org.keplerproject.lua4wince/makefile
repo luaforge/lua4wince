@@ -65,7 +65,7 @@ KEPLER_DIRS:=$(sort $(foreach FILE, $(KEPLER_FILES), $(dir $(FILE))))
 SRC=source/main.c $(LFS_SRC) $(SOCKET_SRC) $(OS_SOCKS) $(LPEG_SRC) $(EXTS_SRC) $(RNGS_SRC) $(LMD5_SRC) $(LB64_SRC) $(XVNT_SRC) source/lua.c 
 OBJ=$(subst .c,.o,$(SRC))
 	
-LIBS=-lws2 -lm 
+LIBS=-lwininet -lws2 -lm 
 
 define lua_mkdir
 synce-pmkdir /usr | echo 

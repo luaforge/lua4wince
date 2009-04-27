@@ -6,8 +6,10 @@
  */
 
 #include <windows.h>
-#include <shellapi.h>
+#include <wininet.h>
 #include <stdlib.h>
+
+
 
 #include "lua/lua.h"
 #include "lua/lauxlib.h"
@@ -91,8 +93,24 @@ int message(lua_State*L) {
 	return 0;
 }
 
+int isconnected(lua_State*L) {
+	BOOL  BSuccess;
+	DWORD DWFlags;
+
+	BSuccess = InternetGetConnectedState( &DWFlags, 0 );
+	if ( !BSuccess ) {
+		   lua_pushboolean(L, FALSE);
+	} else {
+		   lua_pushboolean(L, TRUE);
+	}
+
+	return 1;
+}
+
 static struct luaL_Reg mobile[] = {
-	{ "message", message }, { NULL,NULL}
+		{ "message", message },
+		{ "isconnected", isconnected },
+		{ NULL,NULL}
 };
 
 
