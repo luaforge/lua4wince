@@ -41,9 +41,29 @@ local init = [==[
   }
   local wsapi_meta = { 
        __index = function (tab, k)
-		    local  _, v = remotedostring("return env[arg(1)]", k)
-		    rawset(tab, k, v)
-		    return v
+		    if k == "headers" then
+		      local headers
+		      local _, all_headers = remotedostring([[
+								if env.headers then
+								  local out = {}
+								  for k, v in pairs(env.headers) do
+								    table.insert(out, 
+										 "[" .. string.format("%q", k) .. "]=" .. 
+										 string.format("%q", v))
+								  end
+								  return "return {" .. table.concat(out, ",") .. "}"
+								end
+							    ]])
+		      if all_headers then
+			local v = loadstring(all_headers)()
+			rawset(tab, k, v)
+			return v
+		      end
+		    else
+		      local  _, v = remotedostring("return env[arg(1)]", k)
+		      rawset(tab, k, v)
+		      return v
+		    end
 		 end,
        __newindex = function (tab, k, v)
 		       rawset(tab, k, v)
@@ -144,7 +164,7 @@ function new(app_name, bootstrap, is_file)
 			   end
 			 end
 			 data.status, data.headers, data.env = nil
-			 if not ok then error(s) end
+			 if not ok then error(flag) end
 		       end
 	   end
 	   return data.status, data.headers, res 

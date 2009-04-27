@@ -26,3 +26,24 @@ end
 function sanitize(text)
    return text:gsub(">", "&gt;"):gsub("<", "&lt;")
 end
+
+function make_rewindable(wsapi_env)
+   local new_env = { input = { position = 1, contents = "" } }
+   function new_env.input:read(size)
+      local left = #self.contents - self.position + 1
+      local s
+      if left < size then
+	 self.contents = self.contents .. wsapi_env.input:read(size - left)
+	 s = self.contents:sub(self.position)
+	 self.position = #self.contents + 1
+      else
+	 s = self.contents:sub(self.position, self.position + size)
+	 self.position = self.position + size
+      end
+      if s == "" then return nil else return s end
+   end
+   function new_env.input:rewind()
+      self.position = 1
+   end
+   return setmetatable(new_env, { __index = wsapi_env, __newindex = wsapi_env })
+end

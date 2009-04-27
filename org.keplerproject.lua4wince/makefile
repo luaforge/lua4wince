@@ -36,6 +36,8 @@ LPEG_SRC=$(wildcard source/lpeg/*.c)
 LMD5_SRC=$(wildcard source/md5/*.c)
 LB64_SRC=$(wildcard source/lbase64/*.c)
 
+#XVNT_SRC=$(wildcard source/xavantetray/*.c)
+
 SOCKET_SRC:= \
 	source/socket/luasocket.c \
 	source/socket/timeout.c \
@@ -60,7 +62,7 @@ LUA_DIRS:=$(sort $(foreach FILE, $(LUA_FILES), $(dir $(FILE))))
 KEPLER_FILES:=$(filter-out CVS% %CVS %CVS/Entries %CVS/Repository %CVS/Root %CVS/Template,$(shell find kepler -type f))
 KEPLER_DIRS:=$(sort $(foreach FILE, $(KEPLER_FILES), $(dir $(FILE))))
 
-SRC=source/main.c $(LFS_SRC) $(SOCKET_SRC) $(OS_SOCKS) $(LPEG_SRC) $(EXTS_SRC) $(RNGS_SRC) $(LMD5_SRC) $(LB64_SRC) source/lua.c 
+SRC=source/main.c $(LFS_SRC) $(SOCKET_SRC) $(OS_SOCKS) $(LPEG_SRC) $(EXTS_SRC) $(RNGS_SRC) $(LMD5_SRC) $(LB64_SRC) $(XVNT_SRC) source/lua.c 
 OBJ=$(subst .c,.o,$(SRC))
 	
 LIBS=-lws2 -lm 

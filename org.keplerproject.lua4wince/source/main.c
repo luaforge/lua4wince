@@ -6,6 +6,7 @@
  */
 
 #include <windows.h>
+#include <shellapi.h>
 #include <stdlib.h>
 
 #include "lua/lua.h"
@@ -56,6 +57,20 @@ const wchar_t *_T(const char*str) {
 	// Return result string
 	return unicodeBuffer;
 
+}
+
+
+char* wordToMultibyte(wchar_t* wstr, char* out) {
+	wchar_t					wout[BUFSIZ] = L"";
+
+	WideCharToMultiByte(CP_ACP, (DWORD)NULL, wout, -1, out, BUFSIZ, NULL, NULL);
+	return out;
+}
+
+
+int lua_panic(lua_State*L) {
+	MessageBoxW(window, _T(lua_tostring(L, -1)), _T("Lua PANIC"), 0);
+	return 0;
 }
 
 /*
@@ -124,6 +139,8 @@ int isdigit(int c) {
 	return _isctype (c, _DIGIT)	;
 }
 
+
+
 int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine,
 		int nCmdShow) {
 
@@ -134,6 +151,8 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine,
 		MessageBoxW(window,L"Fatal Error" , L"Error while initializing LuaState", 0);
 		return -1;
 	}
+
+	lua_atpanic(L, lua_panic);
 
 	luaL_openlibs(L);
 
@@ -160,7 +179,11 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine,
 		return -1;
 	}
 
-	status = lua_pcall(L, 0, 0, 0);
+	char param[BUFSIZ];
+	wordToMultibyte(lpCmdLine, param);
+	lua_pushstring(L, param);
+
+	status = lua_pcall(L, 1, 0, 0);
 
 	if(status!=0) {
 		MessageBoxW(window, _T(lua_tostring(L, -1)), L"Error while initializing LuaState", 0);

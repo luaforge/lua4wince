@@ -32,8 +32,6 @@ require'base64'
 
 table.foreach(lfs, print)
 
-mobile.message('Parameters:' .. table.concat({...}, ' '))
-
 --[[ testing Lua
 package.path = '?;./?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/testsuite/lua/?.lua;;'
 assert(lfs.chdir'/usr/local/share/lua/5.1/testsuite/lua')
@@ -61,3 +59,7 @@ dofile'test.lua'
 ]]
 
 --dofile'xavante_start'
+
+cli = require'sputnik.cli.start-xavante'
+
+cli.execute{webdir='/usr/local/kepler/htdocs'}

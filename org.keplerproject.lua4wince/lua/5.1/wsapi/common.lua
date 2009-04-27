@@ -7,12 +7,15 @@
 -----------------------------------------------------------------------------
 
 local lfs = require "lfs"
-local ringer = require "wsapi.ringer"
+local _, ringer = pcall(require, "wsapi.ringer")
+local _G = _G
 
-pcall(lfs.setmode, io.stdin, "binary")
-pcall(lfs.setmode, io.stdout, "binary")
+module("wsapi.common", package.seeall)
 
-module(..., package.seeall)
+-- Meta information is public even if begining with an "_"
+_G.wsapi._COPYRIGHT   = "Copyright (C) 2007 Kepler Project"
+_G.wsapi._DESCRIPTION = "WSAPI - the Lua Web Server API"
+_G.wsapi._VERSION     = "WSAPI 1.1"
 
 function sv_index(func)
    return function (env, n)
@@ -31,6 +34,11 @@ function input_maker(obj, read_method)
      if n > 0 then return read(obj, n) end
    end
    return input
+end
+
+function setmode()
+   pcall(lfs.setmode, io.stdin, "binary")
+   pcall(lfs.setmode, io.stdout, "binary")
 end
 
 function normalize_app(app_run, is_file)
@@ -57,8 +65,8 @@ function send_content(out, res_iter, write_method)
    end
    if not ok then
       write(out, 
-	    "======== WSAPI ERROR DURING RESPONSE PROCESSING: " ..
-	      tostring(res))
+	    "======== WSAPI ERROR DURING RESPONSE PROCESSING: \n<pre>" ..
+	      tostring(res) .. "\n</pre>")
    end
 end
 
@@ -91,6 +99,10 @@ function error_html(msg)
         </body>
         </html>
       ]], tostring(msg))
+end
+
+function status_500_html(msg)
+   return error_html(msg)
 end
 
 function status_404_html(msg)
@@ -145,9 +157,9 @@ end
 
 function wsapi_env(t)
    local env = {}
+   setmetatable(env, { __index = sv_index(t.env) })
    env.input = input_maker(t.input, t.read_method)
    env.error = t.error
-   setmetatable(env, { __index = sv_index(t.env) })
    env.input.length = tonumber(env.CONTENT_LENGTH) or 0
    if env.PATH_INFO == "" then env.PATH_INFO = "/" end
    return env
@@ -262,18 +274,21 @@ function normalize_paths(wsapi_env, filename, launcher)
      if filename == "" then filename = wsapi_env.PATH_TRANSLATED end
      filename = adjust_non_wrapped(wsapi_env, filename, launcher)
      filename = adjust_iis_path(wsapi_env, filename)
+     wsapi_env.PATH_TRANSLATED = filename
+     wsapi_env.SCRIPT_FILENAME = filename
+   else
+     wsapi_env.PATH_TRANSLATED = filename
+     wsapi_env.SCRIPT_FILENAME = filename
    end
    local s, e = wsapi_env.PATH_INFO:find(wsapi_env.SCRIPT_NAME, 1, true)
    if s == 1 then
      wsapi_env.PATH_INFO = wsapi_env.PATH_INFO:sub(e+1)
      if wsapi_env.PATH_INFO == "" then wsapi_env.PATH_INFO = "/" end    
    end
-   wsapi_env.PATH_TRANSLATED = filename
-   wsapi_env.SCRIPT_FILENAME = filename
 end
 
-function find_module(wsapi_env, filename)
-   normalize_paths(wsapi_env, filename)
+function find_module(wsapi_env, filename, launcher)
+   normalize_paths(wsapi_env, filename, launcher)
    return find_file(wsapi_env.PATH_TRANSLATED)
 end
 
@@ -306,12 +321,14 @@ do
 					  return tab[app]
 				       end })
 
-  local function bootstrap_app(file, modname, ext)
-     local bootstrap = [[
+  local function bootstrap_app(path, file, modname, ext)
+     local bootstrap = [=[
 	   _, package.path = remotedostring("return package.path")
 	   _, package.cpath = remotedostring("return package.cpath")
 	   pcall(require, "luarocks.require")
-     ]]
+	   wsapi = {}
+	   wsapi.app_path = [[]=] .. path .. [=[]]
+     ]=]
      if ext == "lua" then
 	return ringer.new(modname, bootstrap)
      else
@@ -324,33 +341,44 @@ do
     lfs.chdir(path)
     local app, data
     local app_state = app_states[filename]
-    if app_state.mtime == mtime then
+    if mtime and app_state.mtime == mtime then
       for _, state in ipairs(app_state.states) do
 	 if not rawget(state.data, "status") then
 	    return state.app
 	 end
       end
-      app, data = bootstrap_app(file, modname, ext)
+      app, data = bootstrap_app(path, file, modname, ext)
       table.insert(app_state.states, { app = app, data = data })
-   else
-      app, data = bootstrap_app(file, modname, ext)
-      app_states[filename] = { states = { { app = app, data = data } }, 
-	 mtime = mtime }
+    else
+      app, data = bootstrap_app(path, file, modname, ext)
+      if mtime then
+	app_states[filename] = { states = { { app = app, data = data } }, 
+				 mtime = mtime }
+      end
     end
     return app
   end
 
 end
 
-function wsapi_loader_isolated(wsapi_env)
+function wsapi_loader_isolated_helper(wsapi_env, reload)
    local path, file, modname, ext, mtime = 
       find_module(wsapi_env)
+   if reload then mtime = nil end
    if not path then
       error({ 404, "Resource " .. wsapi_env.SCRIPT_NAME .. " not found"})
    end
    local app = load_wsapi_isolated(path, file, modname, ext, mtime)
    wsapi_env.APP_PATH = path
    return app(wsapi_env)
+end
+
+function wsapi_loader_isolated(wsapi_env)
+   return wsapi_loader_isolated_helper(wsapi_env)
+end 
+
+function wsapi_loader_isolated_reload(wsapi_env)
+   return wsapi_loader_isolated_helper(wsapi_env, true)
 end 
 
 do
@@ -360,18 +388,21 @@ do
 					  return tab[app]
 				       end })
 
-  local function bootstrap_app(app_modname)
-     local bootstrap = [[
+  local function bootstrap_app(path, app_modname, extra)
+     local bootstrap = [=[
 	   _, package.path = remotedostring("return package.path")
 	   _, package.cpath = remotedostring("return package.cpath")
 	   pcall(require, "luarocks.require")
-     ]]
+	   wsapi = {}
+	   wsapi.app_path = [[]=] .. path .. [=[]]
+     ]=] .. (extra or "")
      return ringer.new(app_modname, bootstrap)
   end
 
-  function load_isolated_launcher(filename, app_modname)
+  function load_isolated_launcher(filename, app_modname, bootstrap)
     local app, data
     local app_state = app_states[filename]
+    local path, _ = splitpath(filename)
     local mtime = lfs.attributes(filename, "modification")
     if app_state.mtime == mtime then
       for _, state in ipairs(app_state.states) do
@@ -379,10 +410,10 @@ do
 	    return state.app
 	 end
       end
-      app, data = bootstrap_app(app_modname)
+      app, data = bootstrap_app(path, app_modname, bootstrap)
       table.insert(app_state.states, { app = app, data = data })
    else
-      app, data = bootstrap_app(app_modname)
+      app, data = bootstrap_app(path, app_modname, bootstrap)
       app_states[filename] = { states = { { app = app, data = data } }, 
 	 mtime = mtime }
     end
@@ -390,3 +421,4 @@ do
   end
 
 end
+
