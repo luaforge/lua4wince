@@ -2,7 +2,7 @@
 -- MIME support for the Lua language.
 -- Author: Diego Nehab
 -- Conforming to RFCs 2045-2049
--- RCS ID: $Id: mime.lua,v 1.1 2009-04-12 00:03:43 jasonsantos Exp $
+-- RCS ID: $Id: mime.lua,v 1.1 2009-05-02 23:12:19 jasonsantos Exp $
 -----------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------
