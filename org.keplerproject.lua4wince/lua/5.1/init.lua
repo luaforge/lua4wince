@@ -30,7 +30,8 @@ require'md5'
 require're'
 require'base64'
 
-table.foreach(lfs, print)
+local mobile  = require'luamobile'
+local systray = require'luasystray'
 
 --[[ testing Lua
 package.path = '?;./?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/testsuite/lua/?.lua;;'
