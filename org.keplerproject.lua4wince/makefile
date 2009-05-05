@@ -31,12 +31,12 @@ RECEIPTDIR=.sendreceipt
 BASE_SRC=$(wildcard source/*.c)
 LFS_SRC=$(wildcard source/lfs/*.c)
 EXTS_SRC=$(wildcard source/ext/*.c)
+XVNT_SRC=$(wildcard source/luasystray/*.c)
 RNGS_SRC=$(wildcard source/rings/*.c)
 LPEG_SRC=$(wildcard source/lpeg/*.c)
 LMD5_SRC=$(wildcard source/md5/*.c)
 LB64_SRC=$(wildcard source/lbase64/*.c)
-
-#XVNT_SRC=$(wildcard source/xavantetray/*.c)
+LMOB_SRC=$(wildcard source/luamobile/*.c)
 
 SOCKET_SRC:= \
 	source/socket/luasocket.c \
@@ -55,6 +55,8 @@ OS_SOCKS:=source/socket/usocket.c
 else 
 OS_SOCKS:=source/socket/wsocket.c
 endif	
+MIME_SRC=source/socket/mime.c
+
 
 LUA_FILES:=$(filter-out CVS% %CVS %CVS/Entries %CVS/Repository %CVS/Root %CVS/Template,$(shell find lua/5.1 -type f))
 LUA_DIRS:=$(sort $(foreach FILE, $(LUA_FILES), $(dir $(FILE))))
@@ -62,7 +64,7 @@ LUA_DIRS:=$(sort $(foreach FILE, $(LUA_FILES), $(dir $(FILE))))
 KEPLER_FILES:=$(filter-out CVS% %CVS %CVS/Entries %CVS/Repository %CVS/Root %CVS/Template,$(shell find kepler -type f))
 KEPLER_DIRS:=$(sort $(foreach FILE, $(KEPLER_FILES), $(dir $(FILE))))
 
-SRC=source/main.c $(LFS_SRC) $(SOCKET_SRC) $(OS_SOCKS) $(LPEG_SRC) $(EXTS_SRC) $(RNGS_SRC) $(LMD5_SRC) $(LB64_SRC) $(XVNT_SRC) source/lua.c 
+SRC=source/main.c $(LFS_SRC) $(MIME_SRC) $(SOCKET_SRC) $(OS_SOCKS) $(LPEG_SRC) $(EXTS_SRC) $(RNGS_SRC) $(LMD5_SRC) $(LB64_SRC) $(XVNT_SRC) $(LMOB_SRC) source/lua.c 
 OBJ=$(subst .c,.o,$(SRC))
 	
 LIBS=-lwininet -lws2 -lm 
@@ -146,6 +148,7 @@ execute:
 ifneq "$(TARGETNAME)" "linux"
 	synce-prun My\ Documents/$(EXENAME)
 	echo 'Run successful'
+	epiphany http://169.254.2.1:8080
 else
 	$(TARGETDIR)/$(EXENAME)
 	echo 'Run successful'

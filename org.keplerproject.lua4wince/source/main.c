@@ -21,100 +21,10 @@ HWND window;
 char const * INIT_FILE = "\\usr\\local\\share\\lua\\5.1\\init.lua";
 wchar_t const * WINIT_FILE = L"\\usr\\local\\share\\lua\\5.1\\init.lua";
 
-const wchar_t *_T(const char*str) {
-	// Special case of empty string
-	if (!str[0]) {
-		return L"" ;
-	}
-
-	// Get the required number of WCHARs for destination string
-	int requiredWChars = MultiByteToWideChar(
-			CP_ACP, // ANSI code page
-			0, // Default flags
-			str, // String to be converted
-			-1, // Process whole string till NUL terminator
-			NULL, // Destination buffer unused
-			0 // Request number of WCHARs
-	);
-
-	if ( requiredWChars == 0 )
-	return L""; // *** ERROR
-
-	// Allocate buffer for Unicode string
-	wchar_t* unicodeBuffer = (wchar_t*)malloc( requiredWChars );
-
-	// Convert from ANSI to Unicode
-
-	if (MultiByteToWideChar(
-					CP_ACP, // ANSI code page
-					0, // Default flags
-					str, // String to be converted
-					-1, // Process whole string till NUL terminator
-					unicodeBuffer, // Destination buffer
-					requiredWChars // Destination buffer size
-			) == 0 )
-
-	return L""; // *** ERROR
-
-	// Return result string
-	return unicodeBuffer;
-
-}
-
-
-char* wordToMultibyte(wchar_t* wstr, char* out) {
-	wchar_t					wout[BUFSIZ] = L"";
-
-	WideCharToMultiByte(CP_ACP, (DWORD)NULL, wout, -1, out, BUFSIZ, NULL, NULL);
-	return out;
-}
 
 
 int lua_panic(lua_State*L) {
 	MessageBoxW(window, _T(lua_tostring(L, -1)), _T("Lua PANIC"), 0);
-	return 0;
-}
-
-/*
- const wchar_t *_T(const char*mbs) {
- int wclen = (mblen(mbs, MB_CUR_MAX)+1)*2;
-
- wchar_t* wcstr = malloc(wclen);
- memset(wcstr, 0, wclen);
-
- mbstowcs(wcstr, mbs, mblen(mbs, MB_CUR_MAX));
-
- return wcstr;
- }
- */
-int message(lua_State*L) {
-	luaL_checkany(L, 1);
-	MessageBoxW(window, _T(lua_tostring(L, 1)), _T("Lua 5.1"), 0);
-	return 0;
-}
-
-int isconnected(lua_State*L) {
-	BOOL  BSuccess;
-	DWORD DWFlags;
-
-	BSuccess = InternetGetConnectedState( &DWFlags, 0 );
-	if ( !BSuccess ) {
-		   lua_pushboolean(L, FALSE);
-	} else {
-		   lua_pushboolean(L, TRUE);
-	}
-
-	return 1;
-}
-
-static struct luaL_Reg mobile[] = {
-		{ "message", message },
-		{ "isconnected", isconnected },
-		{ NULL,NULL}
-};
-
-
-static int createTrayIcon() {
 	return 0;
 }
 
@@ -141,11 +51,15 @@ int luaopen_lpeg (lua_State *L);
 
 int _jason_openlibs(lua_State* L) {
 	luaopen_socket_core(L); 	/* Opening the Socket library */
+	luaopen_mime_core(L); 		/* Opening the Socket library mime support*/
+
 	luaopen_lfs(L);				/* Opening the Lua Filesystem library */
 	luaopen_rings(L);			/* Opening the Rings library */
-	luaopen_md5_core(L);			/* Opening the MD5 library */
+	luaopen_md5_core(L);		/* Opening the MD5 library */
 	luaopen_base64(L);			/* Opening the Base64 library */
 	luaopen_des56(L);			/* Opening the DES56 library */
+	luaopen_luasystray(L); 		/* Opening the LuaSysTray library */
+	luaopen_luamobile(L); 		/* Opening the LuaMobile library */
 	/* Opening the LPeg library */
 	lua_pushcclosure(L, luaopen_lpeg, 0);
 	lua_pushstring(L, "lpeg");
@@ -175,9 +89,6 @@ int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine,
 	luaL_openlibs(L);
 
 	_jason_openlibs(L); 	/* Open the additional built-in libraries */
-
-
-	luaL_register(L, "mobile", mobile);
 
 	int status = 0;
 
