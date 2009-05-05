@@ -1,0 +1,51 @@
+#include "resource.h"
+
+// ICONS
+
+IDI_XAVANTETRAY         ICON    DISCARDABLE     "XavanteTray.ICO"
+IDI_XAVANTESTART        ICON    DISCARDABLE     "start.ico"
+IDI_XAVANTESTOP         ICON    DISCARDABLE     "stop.ico"
+
+// Bitmap
+
+IDB_XAVANTELOGO         BITMAP  DISCARDABLE     "xavante.bmp"
+
+// MENU
+
+IDR_POPUP_MENU MENU DISCARDABLE 
+BEGIN
+    POPUP "POPUP"
+    BEGIN
+        MENUITEM "Start Xavante",               IDM_CYCLE
+//        MENUITEM "Show Log...",                 IDM_SHOWLOG
+        MENUITEM "About Xavante Launcher...",   IDM_ABOUT
+        MENUITEM "Exit Launcher",               IDM_EXIT
+    END
+END
+
+IDR_POPUP_CLOSE MENU DISCARDABLE 
+BEGIN
+    POPUP "POPUP"
+    BEGIN
+        MENUITEM "Stop Xavante",                IDM_CYCLE
+//        MENUITEM "Show Log...",                 IDM_SHOWLOG
+        MENUITEM "About Xavante Launcher...",   IDM_ABOUT
+        MENUITEM "Exit Launcher",               IDM_EXIT
+    END
+END
+
+// ABOUT DIALOG
+
+IDD_ABOUTBOX DIALOG DISCARDABLE  22, 17, 256, 69
+STYLE DS_MODALFRAME | WS_CAPTION | WS_SYSMENU
+CAPTION "About"
+FONT 8, "MS Sans Serif"
+BEGIN
+    LTEXT           "Xavante 2.0 Launcher (v 1.2)",IDC_STATIC,64,8,119,8,
+                    SS_NOPREFIX
+    LTEXT           "Copyright (C) 2005-2007 - Kepler Project",IDC_STATIC,64,24,
+                    117,8
+    DEFPUSHBUTTON   "OK",IDOK,192,48,56,16,WS_GROUP
+    CONTROL         134,IDC_STATIC,"Static",SS_BITMAP,7,4,43,39
+    LTEXT           "http://www.keplerproject.org",IDC_STATIC,64,40,92,8
+END
