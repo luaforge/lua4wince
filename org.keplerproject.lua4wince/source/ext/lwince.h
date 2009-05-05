@@ -80,6 +80,13 @@ extern __declspec(dllexport) char *readline_lua(char *b, int nMax, const char *p
 __declspec(dllimport) char *readline_lua(char *b, int nMax, const char *prompt);
 #endif
 
+/*
+ * Unicode conversion
+ */
+
+const wchar_t *_T(const char*str);
+
+char* wordToMultibyte(wchar_t* wstr, char* out);
 
 /*
 ** Emulate support for a "current directory"

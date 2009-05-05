@@ -37,6 +37,7 @@ static char		tmpFileName[MAX_PATH];
 /*
 ** ==================================================================
 ** Ian McIntosh - additional functions for port to WinCE.
+** Jason Santos - and some of mine too
 ** ===================================================================
 */
 
@@ -108,6 +109,54 @@ RTEXP	int	rmdir(const char *dirname) {
 	return -1;
 }
 
+
+const wchar_t *_T(const char*str) {
+	// Special case of empty string
+	if (!str[0]) {
+		return L"" ;
+	}
+
+	// Get the required number of WCHARs for destination string
+	int requiredWChars = MultiByteToWideChar(
+			CP_ACP, // ANSI code page
+			0, // Default flags
+			str, // String to be converted
+			-1, // Process whole string till NUL terminator
+			NULL, // Destination buffer unused
+			0 // Request number of WCHARs
+	);
+
+	if ( requiredWChars == 0 )
+	return L""; // *** ERROR
+
+	// Allocate buffer for Unicode string
+	wchar_t* unicodeBuffer = (wchar_t*)malloc( requiredWChars );
+
+	// Convert from ANSI to Unicode
+
+	if (MultiByteToWideChar(
+					CP_ACP, // ANSI code page
+					0, // Default flags
+					str, // String to be converted
+					-1, // Process whole string till NUL terminator
+					unicodeBuffer, // Destination buffer
+					requiredWChars // Destination buffer size
+			) == 0 )
+
+	return L""; // *** ERROR
+
+	// Return result string
+	return unicodeBuffer;
+
+}
+
+
+char* wordToMultibyte(wchar_t* wstr, char* out) {
+	wchar_t					wout[BUFSIZ] = L"";
+
+	WideCharToMultiByte(CP_ACP, (DWORD)NULL, wout, -1, out, BUFSIZ, NULL, NULL);
+	return out;
+}
 
 /*
 ** Overridden version of runtime fopen, that checks "current directory" if
