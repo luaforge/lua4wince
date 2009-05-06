@@ -2,7 +2,7 @@
 -- MIME support for the Lua language.
 -- Author: Diego Nehab
 -- Conforming to RFCs 2045-2049
--- RCS ID: $Id: mime.lua,v 1.1 2009-04-12 00:03:43 jasonsantos Exp $
+-- RCS ID: $Id: mime.lua,v 1.2 2009-05-06 01:51:24 jasonsantos Exp $
 -----------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------
@@ -14,6 +14,14 @@ local mime = require("mime.core")
 local io = require("io")
 local string = require("string")
 module("mime")
+
+print = function(...)
+	local f = io.open('/usr/local/kepler/log/sputnik.log', 'w+')
+	if f then
+		f:write(...)
+		f:close()
+	end
+end
 
 -- encode, decode and wrap algorithm tables
 encodet = {}
@@ -35,6 +43,8 @@ end
 
 -- define the encoding filters
 encodet['base64'] = function()
+	print'before'
+	print(b64)
     return ltn12.filter.cycle(b64, "")
 end
 

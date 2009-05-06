@@ -148,7 +148,6 @@ execute:
 ifneq "$(TARGETNAME)" "linux"
 	synce-prun My\ Documents/$(EXENAME)
 	echo 'Run successful'
-	epiphany http://169.254.2.1:8080
 else
 	$(TARGETDIR)/$(EXENAME)
 	echo 'Run successful'

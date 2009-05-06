@@ -773,7 +773,7 @@ function Sputnik:handle_request(request, response)
    end
 
    node = self:activate_node(node, request)
-self.logger:debug("request.action:".. tostring(request.action) )
+
    local action = request.action or "show"
    local action_function = node.actions[action]
 

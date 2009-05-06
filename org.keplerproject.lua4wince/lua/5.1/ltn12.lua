@@ -2,7 +2,7 @@
 -- LTN12 - Filters, sources, sinks and pumps.
 -- LuaSocket toolkit.
 -- Author: Diego Nehab
--- RCS ID: $Id: ltn12.lua,v 1.1 2009-05-02 23:12:19 jasonsantos Exp $
+-- RCS ID: $Id: ltn12.lua,v 1.2 2009-05-06 01:51:23 jasonsantos Exp $
 -----------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------
@@ -38,6 +38,7 @@ end
 -- chains a bunch of filters together
 -- (thanks to Wim Couwenberg)
 function filter.chain(...)
+	local arg = {...}
     local n = table.getn(arg)
     local top, index = 1, 1
     local retry = ""

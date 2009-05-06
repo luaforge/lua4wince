@@ -2,7 +2,7 @@
 -- MIME support for the Lua language.
 -- Author: Diego Nehab
 -- Conforming to RFCs 2045-2049
--- RCS ID: $Id: mime.lua,v 1.1 2009-05-02 23:12:19 jasonsantos Exp $
+-- RCS ID: $Id: mime.lua,v 1.2 2009-05-06 01:51:24 jasonsantos Exp $
 -----------------------------------------------------------------------------
 
 -----------------------------------------------------------------------------
@@ -13,7 +13,16 @@ local ltn12 = require("ltn12")
 local mime = require("mime.core")
 local io = require("io")
 local string = require("string")
+local tostring = tostring
+local pairs = pairs
+local table = require'table'
 module("mime")
+
+
+-- JASON -- fix problem with mime.core not being the same module anymore
+for sym, fcn in pairs(mime) do
+	_M[sym] = fcn
+end
 
 -- encode, decode and wrap algorithm tables
 encodet = {}
@@ -35,7 +44,12 @@ end
 
 -- define the encoding filters
 encodet['base64'] = function()
-    return ltn12.filter.cycle(b64, "")
+	print'base64'
+	print(mime)
+	table.foreach(mime or {}, print)
+	print('b64:', b64)
+	print'we have seen the function, man'
+    return ltn12.filter.cycle(mime.b64, "")
 end
 
 encodet['quoted-printable'] = function(mode)
@@ -45,7 +59,7 @@ end
 
 -- define the decoding filters
 decodet['base64'] = function()
-    return ltn12.filter.cycle(unb64, "")
+    return ltn12.filter.cycle(mime.unb64, "")
 end
 
 decodet['quoted-printable'] = function()

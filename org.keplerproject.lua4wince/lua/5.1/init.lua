@@ -2,9 +2,11 @@
 package.path = '?;./?.lua;/usr/local/share/lua/5.1/?.lua;/usr/local/share/lua/5.1/?/init.lua;;;'
 assert(lfs.chdir'/usr/local/share/lua/5.1')
 
+LOGFILE = '/usr/local/kepler/log/sputnik.log'
+
 --- log function
 function log(...)
-	local f = io.open('logfile.txt', 'a+')
+	local f = io.open(LOGFILE, 'a+')
 	local t = {...}
 	local s = ''
 
@@ -21,7 +23,18 @@ function require(...)
 	return oldrequire(...)
 end
 
-print = log
+print = function(...)
+	local f = io.open(LOGFILE, 'a+')
+	if f then
+		local t = {...}
+		for k,v in pairs(t) do
+			f:write(tostring(v)) 
+			f:write'\t' 
+		end
+		f:write('\n')
+		f:close()
+	end
+end
 
 require'lfs'
 require'socket'
