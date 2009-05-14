@@ -1,5 +1,5 @@
 /*
-** $Id: loslib.c,v 1.1 2009-04-12 00:03:43 jasonsantos Exp $
+** $Id: loslib.c,v 1.2 2009-05-14 03:50:04 jasonsantos Exp $
 ** Standard Operating System library
 ** See Copyright Notice in lua.h
 */
@@ -37,7 +37,7 @@ static int os_pushresult (lua_State *L, int i, const char *filename) {
 
 static int os_execute (lua_State *L) {
 
-  /* lua_pushinteger(L, system(luaL_optstring(L, 1, NULL))); */
+  lua_pushinteger(L, system(luaL_optstring(L, 1, NULL)));
   return 1;
 }
 
